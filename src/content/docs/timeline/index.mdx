@@ -1,0 +1,82 @@
+---
+title: Timeline
+description: Get started building your docs site with Starlight.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Timelineは、複数のTweenをたばねて作った一連のアニメーションの流れ。
+
+## 基本の使い方
+
+```js
+gsap.timeline()
+  .from(".target01",{opacity:0})
+  .from(".target02",{opacity:0,scale:0,ease:"back"})
+  .from(".target03 img",{y:160, stagger:0.1,duration:0.5,ease:"back"})
+  .from(".target04",{xPercent:100,ease:"back"})
+```
+このように書くと1行目から処理が順番に実行されていく。
+つまり2つ目のTweenはひとつ目のTweenが実行された後に再生がはじまるということ。
+
+:::tip[Tip]
+`xPercent:100`とはxを対象要素（今回でいう`.target04`）の横幅の距離だけ移動するという意味。
+:::
+
+## Position Parameter
+### 開始を遅らせる
+直前のTweenの再生が終わった後、1秒待ってからTweenをはじめるなら`"+=1"`。
+```js
+gsap.timeline()
+  .to("#one",{duration:2, x:500})
+  .to("#two",{duration:1, x:500},"+=1")
+  .to("#three",{duration:1, x:500})
+```
+### 開始を早める
+直前のTweenの再生が終わったより、1秒早くTweenをはじめるなら`"-=1"`。
+```js
+gsap.timeline()
+  .to("#one",{duration:2, x:500})
+  .to("#two",{duration:1, x:500},"-=1")
+  .to("#three",{duration:1, x:500})
+```
+### ひとつ前のTweenと同時に開始
+ひとつ前のTweenと同時に開始 という意味のパラメーター`"<"`
+```js
+gsap.timeline()
+  .to("#one",{duration:2, x:500})
+  .to("#two",{duration:1, x:500},"<")
+  .to("#three",{duration:1, x:500})
+```
+ひとつ前のTweenの開始1秒後`"<1"`
+```js
+gsap.timeline()
+  .to("#one",{duration:2, x:500})
+  .to("#two",{duration:3, x:500},"<1")
+  .to("#three",{duration:1, x:500})
+```
+
+### 絶対値での再生開始秒数指定
+```js
+gsap.timeline()
+  .to("#one",{duration:2, x:500})
+  .to("#two",{duration:3, x:500},1)//1秒で開始
+  .to("#three",{duration:1, x:500}, 4)//4秒で開始
+```
+
+
+## Timelineの再生コントロール
+Tweenと同様Timelineにも`.play()`,`.pause()`,`.reverse()`,`.restart()` が使える。
+その他に`.add()` 再生スキップ用の目印を入れておくこともできる。
+
+```js
+const tl = gsap.timeline({paused: true})
+  .to("#one",{duration:2, x:500})
+  .to("#two",{duration:3, x:500})
+  .add("skip")
+  .to("#three",{duration:1, x:500})
+
+document.querySelector("#skip").addEventListener("click",()=>{
+  tl.play("skip");// .add("skip")の位置にスキップ
+})
+```

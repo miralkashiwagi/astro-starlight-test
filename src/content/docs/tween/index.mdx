@@ -1,0 +1,122 @@
+---
+title: Tween
+description: Get started building your docs site with Starlight.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Tweenは、ひとつの要素のひとつのプロパティを時間とともに変化させるもの。
+
+## 主なメソッド
+
+```js
+gsap.to()
+gsap.from()
+gsap.fromTo()
+```
+
+
+
+```js
+gsap.to(".target", {x:750, duration:3})
+gsap.from(".target", {x:750, duration:3})
+gsap.fromTo(".target", {x:0, duration:3}, {x:750, duration:3})
+```
+
+<dl>
+    <dt>第1引数`.target`</dt>
+    <dd>ターゲット</dd>
+    <dt>第2引数`{x:750, duration:3}`</dt>
+    <dd>varsオブジェクト</dd>
+</dl>
+
+varsオブジェクトは、Tweenがどう動くのかを示すプロパティの集まり。
+durationは特別なプロパティで、アニメーションの動作ではなく長さを表す。
+
+
+
+## メソッドの使い分け
+
+### `.to()`
+CSSまたはSVGの要素はアニメーションの開始時点の状態にしておき、そこから別の状態へ変化させるなら`.to()`。
+
+### `.from()`
+CSSまたはSVGの要素はアニメーション終了時点の状態にしておくなら`.from()`。
+とくに要素を出現させるアニメーションでは、CSSは出現後の状態にして
+```js
+gsap.from(".target",{opacity:0});
+```
+のようにすると便利。
+
+### `.fromTo()`
+指定した値から指定した値へのアニメーション。
+たとえば以下のようなアニメーションの場合、`.from()`を用いるとマウス操作のタイミングによって、変化後の値が変ってしまうことがある。
+```js
+button.addEventListener("mouseenter",()=>{
+   gsap.from(".target", {scale:0})
+});
+```
+そういうときは明示的に変化後の値を示す必要があるので`.fromTo()`をつかう。
+```js
+button.addEventListener("mouseenter",()=>{
+   gsap.fromTo(".target", {scale:0}, {scale:1})
+});
+```
+
+
+## Stagger
+通常TweenはひとつのTweenがすべての要素を同時に動かすが、順番にアニメーションを動作させることができる
+
+```html
+<div class="star"></div>
+<div class="star"></div>
+<div class="star"></div>
+```
+
+```js
+gsap.to(".star",{stagger:1, x:750, rotation:360, fill:"yellow", duration:3});
+```
+`stagger:1` は1秒おきにアニメーションを発火させる。
+また、値はオブジェクトにできる。
+
+```js
+gsap.to(".stagger img",{duration:0.2,y:-50,stagger:{amount:1}})
+```
+詳しくは[GSAP公式のStagger](https://gsap.com/resources/getting-started/Staggers/#advanced-configuration)を参照
+
+
+## リピート（ループ）
+```js
+gsap.to(".target",{x:600,repeat:1,yoyo:true})
+```
+<dl>
+    <dt>repeat</dt>
+    <dd>0は1回のみ再生、1は2回再生、-1は無限リピート</dd>
+    <dt>yoyo</dt>
+    <dd>trueの場合は、1回順再生・1回逆再生（リピートが1の場合）</dd>
+</dl>
+
+## Tweenの再生コントロール
+指定のイベント時にTweenを動かせる。
+そのためにはまず`paused:true`にしたTweenを変数/定数に入れておき、動かしたいタイミングで`.play()`等を使う。
+
+```js
+const tween = gsap.to(".target",{x:400,paused:true});
+
+document.querySelector("#play").addEventListener("click",()=>{
+  tween.play();
+})
+document.querySelector("#pause").addEventListener("click",()=>{
+  tween.pause();
+})
+document.querySelector("#reverse").addEventListener("click",()=>{
+  tween.reverse();
+})
+document.querySelector("#restart").addEventListener("click",()=>{
+  tween.restart();
+})
+```
+
+GSAPの再生位置は、途中で止めても自動で先頭に戻ったりはしない。
+pauseで止めた位置からplayやreverseは始まる。
+先頭に戻したいときはrestartする。
