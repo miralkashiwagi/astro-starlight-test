@@ -50,3 +50,49 @@ gsap.timeline({scrollTrigger:{
 
 
 ![startとendの値の設定についての説明画像](../../../assets/images/scrolltrigger/scrolltrigger.png)
+
+### `endTrigger`で `end` の計算に使う要素を変える
+例えばページをスクロールし始めた瞬間をstartとして(bodyの"top top")、
+特定の要素の下端が画面に描画されたらendとする(.othersの"bottom bottom")
+```js
+  trigger:"body",
+  endTrigger:".others",
+  start:"top top",
+  end:"bottom bottom",
+```
+
+## `.create()` を使ったScrollTriggerの応用
+tweenやtimelineを`ScrollTrigger.create()`を使って動作させることもできる。
+※tweenとしている部分は、timelineでも同様に動作する
+
+### `animation`を使う場合
+```js
+const tween = gsap.to(".animation-target",{scaleX:1, paused:true});
+
+ScrollTrigger.create({
+  trigger:".scroll-target",
+  start:"top 50%",
+  end:"bottom 50%",
+  animation:tween
+})
+```
+
+### `onUpdate()` を使う場合
+以下の`self.progress` にはstartを0、endを1として現在の進捗状況が入っており、
+その数値を `tween.progress()` に渡すことでアニメーションを再生させられる。
+
+```js
+const tween = gsap.to(".animation-target",{scaleX:1, paused:true});
+
+ScrollTrigger.create({
+  trigger:".scroll-target",
+  start:"top 50%",
+  end:"bottom 50%",
+  onUpdate:(self)=>{
+    tween.progress(self.progress);
+  }
+})
+```
+
+
+
