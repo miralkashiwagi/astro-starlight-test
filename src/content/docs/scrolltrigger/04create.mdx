@@ -1,0 +1,59 @@
+---
+title: create()
+description: Get started building your docs site with Starlight.
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+**先にScrollTriggerの設定を作ってその中で行いたい動作を書く** のが `ScrollTrigger.create()`。
+TweenやTimelineを動かす場合は`.to()``.timeline()`の中で`scrollTrigger`を書くのでも動作は変わらない。
+
+
+## `.create()` を使ったScrollTriggerの設定
+tweenやtimelineを`ScrollTrigger.create()`を使って動作させる方法について。
+※tweenとしている部分は、timelineでも同様に動作する
+
+### `animation`を使う場合
+```js
+const tween = gsap.to(".animation-target",{scaleX:1, paused:true});
+
+ScrollTrigger.create({
+  trigger:".scroll-target",
+  start:"top 50%",
+  end:"bottom 50%",
+  animation:tween,//ここでアニメーションを指定
+  scrub:true
+})
+```
+
+### `onUpdate()` を使う場合
+以下の`self.progress` にはstartを0、endを1として現在の進捗状況が入っており、
+その数値を `tween.progress()` に渡すことでアニメーションを再生させられる。
+
+```js
+const tween = gsap.to(".animation-target",{scaleX:1, paused:true});
+
+ScrollTrigger.create({
+  trigger:".scroll-target",
+  start:"top 50%",
+  end:"bottom 50%",
+  scrub:true,
+  onUpdate:(self)=>{
+    tween.progress(self.progress);//ここでアニメーションを指定
+  }
+})
+```
+
+#### 応用例
+```js
+onUpdate:(self)=>{
+ //現在の進捗量が、tweenの進捗量より大きいときだけtweenを進捗させる（再生位置を戻さない）
+ if(self.progress > tween.progress()){
+   tween.progress(self.progress)
+ }
+}
+```
+
+
+
+
